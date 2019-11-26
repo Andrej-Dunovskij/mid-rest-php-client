@@ -24,23 +24,11 @@
  * THE SOFTWARE.
  * #L%
  */
-namespace Sk\Mid\Rest;
-use Sk\Mid\Rest\Dao\Request\AuthenticationRequest;
-use Sk\Mid\Rest\Dao\Request\CertificateRequest;
-use Sk\Mid\Rest\Dao\Request\SessionStatusRequest;
-use Sk\Mid\Rest\Dao\Request\SignRequest;
-use Sk\Mid\Rest\Dao\Response\CertificateResponse;
-use Sk\Mid\Rest\Dao\Response\AuthenticationResponse;
-use Sk\Mid\Rest\Dao\Response\SignResponse;
-use Sk\Mid\Rest\Dao\SessionStatus;
+namespace Sk\Mid;
 
-interface MobileIdConnector
+abstract class MobileIdSignError
 {
-    public function initAuthentication(AuthenticationRequest $request) : AuthenticationResponse;
-
-    public function initSign(SignRequest $request) : SignResponse;
-
-    public function pullAuthenticationSessionStatus(SessionStatusRequest $request) : SessionStatus;
-
-    public function pullCertificate(CertificateRequest $request) : CertificateResponse;
+    const INVALID_RESULT = 'Response result verification failed';
+    const SIGNATURE_VERIFICATION_FAILURE = 'Signature verification failed';
+    const CERTIFICATE_EXPIRED = 'Signer\'s certificate expired';
 }

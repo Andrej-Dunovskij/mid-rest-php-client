@@ -24,23 +24,32 @@
  * THE SOFTWARE.
  * #L%
  */
-namespace Sk\Mid\Rest;
-use Sk\Mid\Rest\Dao\Request\AuthenticationRequest;
-use Sk\Mid\Rest\Dao\Request\CertificateRequest;
-use Sk\Mid\Rest\Dao\Request\SessionStatusRequest;
-use Sk\Mid\Rest\Dao\Request\SignRequest;
-use Sk\Mid\Rest\Dao\Response\CertificateResponse;
-use Sk\Mid\Rest\Dao\Response\AuthenticationResponse;
-use Sk\Mid\Rest\Dao\Response\SignResponse;
-use Sk\Mid\Rest\Dao\SessionStatus;
-
-interface MobileIdConnector
+namespace Sk\Mid\Rest\Dao\Response;
+class SignResponse
 {
-    public function initAuthentication(AuthenticationRequest $request) : AuthenticationResponse;
 
-    public function initSign(SignRequest $request) : SignResponse;
+    /** @var string $sessionId */
+    private $sessionId;
 
-    public function pullAuthenticationSessionStatus(SessionStatusRequest $request) : SessionStatus;
+    public function __construct(array $responseJson)
+    {
+        $this->setSessionId($responseJson['sessionID'] ?? $responseJson['sessionId']);
+    }
 
-    public function pullCertificate(CertificateRequest $request) : CertificateResponse;
+
+    public function getSessionId() : string
+    {
+        return $this->sessionId;
+    }
+
+    public function setSessionId(string $sessionId) : void
+    {
+        $this->sessionId = $sessionId;
+    }
+
+    public function toString() : string
+    {
+        return  "SignResponse{sessionID='" . $this->sessionId . '}';
+    }
+
 }

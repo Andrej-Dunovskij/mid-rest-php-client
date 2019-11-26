@@ -24,23 +24,58 @@
  * THE SOFTWARE.
  * #L%
  */
-namespace Sk\Mid\Rest;
-use Sk\Mid\Rest\Dao\Request\AuthenticationRequest;
-use Sk\Mid\Rest\Dao\Request\CertificateRequest;
-use Sk\Mid\Rest\Dao\Request\SessionStatusRequest;
-use Sk\Mid\Rest\Dao\Request\SignRequest;
-use Sk\Mid\Rest\Dao\Response\CertificateResponse;
-use Sk\Mid\Rest\Dao\Response\AuthenticationResponse;
-use Sk\Mid\Rest\Dao\Response\SignResponse;
-use Sk\Mid\Rest\Dao\SessionStatus;
 
-interface MobileIdConnector
+namespace Sk\Mid;
+
+class MobileIdSignResult
 {
-    public function initAuthentication(AuthenticationRequest $request) : AuthenticationResponse;
 
-    public function initSign(SignRequest $request) : SignResponse;
+    /** @var MidIdentity $authenticationIdentity */
+    private $authenticationIdentity;
 
-    public function pullAuthenticationSessionStatus(SessionStatusRequest $request) : SessionStatus;
+    /** @var bool $valid */
+    private $valid = true;
 
-    public function pullCertificate(CertificateRequest $request) : CertificateResponse;
+    /** @var array $errors */
+    private $errors = array();
+
+    public function __construct()
+    {
+    }
+
+    public function getSignIdentity(): ?MidIdentity
+    {
+        return $this->authenticationIdentity;
+    }
+
+    public function setSignIdentity(MidIdentity $authenticationIdentity)
+    {
+        $this->authenticationIdentity = $authenticationIdentity;
+    }
+
+    public function isValid(): bool
+    {
+        return $this->valid;
+    }
+
+    public function setValid(bool $valid): void
+    {
+        $this->valid = $valid;
+    }
+
+    public function getErrors(): array
+    {
+        return $this->errors;
+    }
+
+    public function getErrorsAsString(): string
+    {
+        return implode("; ", $this->getErrors());
+    }
+
+    public function addError(string $error): void
+    {
+        array_push($this->errors, $error);
+    }
+
 }

@@ -1,0 +1,29 @@
+# System files
+.DS_store
+.idea
+!.gitkeep
+
+# Temp, vendor and other files
+._*
+.~lock.*
+*.old
+/.web-server-pid
+/app/config/parameters.yml
+/build/
+/phpunit.xml
+/var/*
+!/var/cache
+/var/cache/*
+!var/cache/.gitkeep
+!/var/logs
+/var/logs/*
+!var/logs/.gitkeep
+!/var/sessions
+/var/sessions/*
+!var/sessions/.gitkeep
+!var/SymfonyRequirements.php
+/vendor/
+/web/bundles/
+/web/uploads/
+/web/data/
+/app/config/config_dev.yml

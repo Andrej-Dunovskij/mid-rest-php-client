@@ -102,11 +102,36 @@ class SessionStatusPoller
         return $sessionStatus;
     }
 
+    private function pollSignForFinalSessionStatus(string $sessionId, ?int $longPollSeconds = 20) : SessionStatus
+    {
+        $sessionStatus = null;
+
+        while ($sessionStatus == null || strcasecmp($sessionStatus->getState(), 'RUNNING') == 0) {
+            $sessionStatus = $this->pollSignSessionStatus($sessionId, $longPollSeconds);
+            if ($sessionStatus->isComplete()) {
+                return $sessionStatus;
+            }
+
+            $this->logger->debug('Sleeping for ' . $this->pollingSleepTimeoutSeconds . ' seconds');
+            sleep($this->pollingSleepTimeoutSeconds);
+        }
+
+        $this->logger->debug('Got session final session status response');
+        return $sessionStatus;
+    }
+
     private function pollSessionStatus(string $sessionId, ?int $longPollSeconds = null) : SessionStatus
     {
         $this->logger->debug('Polling session status');
         $request = $this->createSessionStatusRequest($sessionId, $longPollSeconds);
         return $this->connector->pullAuthenticationSessionStatus($request);
+    }
+
+    private function pollSignSessionStatus(string $sessionId, ?int $longPollSeconds = null) : SessionStatus
+    {
+        $this->logger->debug('Polling sign session status');
+        $request = $this->createSessionStatusRequest($sessionId, $longPollSeconds);
+        return $this->connector->pullSignSessionStatus($request);
     }
 
     private function createSessionStatusRequest(string $sessionId, ?int $longPollSeconds) : SessionStatusRequest

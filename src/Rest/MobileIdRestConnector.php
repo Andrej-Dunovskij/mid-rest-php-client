@@ -34,14 +34,15 @@ use Sk\Mid\Rest\Dao\Request\AbstractRequest;
 use Sk\Mid\Rest\Dao\Request\AuthenticationRequest;
 use Sk\Mid\Rest\Dao\Request\CertificateRequest;
 use Sk\Mid\Rest\Dao\Request\SessionStatusRequest;
+use Sk\Mid\Rest\Dao\Request\SignRequest;
 use Sk\Mid\Rest\Dao\Response\AuthenticationResponse;
 use Sk\Mid\Rest\Dao\Response\CertificateResponse;
+use Sk\Mid\Rest\Dao\Response\SignResponse;
 use Sk\Mid\Rest\Dao\SessionStatus;
 use Sk\Mid\Util\Logger;
 
 class MobileIdRestConnector implements MobileIdConnector
 {
-
     /** @var Logger $logger */
     private $logger;
 
@@ -100,6 +101,13 @@ class MobileIdRestConnector implements MobileIdConnector
         return $this->postAuthenticationRequest($url, $request);
     }
 
+    public function initSign(SignRequest $request) : SignResponse
+    {
+        $this->setRequestRelyingPartyDetailsIfMissing($request);
+        $url = $this->endpointUrl . '/signature';
+        return $this->postSignRequest($url, $request);
+    }
+
     private function setRequestRelyingPartyDetailsIfMissing(AbstractRequest $request) : void
     {
         if (is_null($request->getRelyingPartyUUID())) {
@@ -130,6 +138,19 @@ class MobileIdRestConnector implements MobileIdConnector
         return new SessionStatus($responseAsArray);
     }
 
+    public function pullSignSessionStatus(SessionStatusRequest $request) : SessionStatus
+    {
+        $url = $this->endpointUrl. '/signature/session/' . $request->getSessionId();
+
+        if ($request->getSessionStatusResponseSocketTimeoutMs() != null) {
+            $url = $url . '?timeoutMs='.$request->getSessionStatusResponseSocketTimeoutMs();
+        }
+
+        $this->logger->debug('Sending get request to ' . $url);
+        $responseAsArray = $this->getRequest($url);
+        if (isset($responseAsArray['error'])) throw new MidSessionNotFoundException($request->getSessionId());
+        return new SessionStatus($responseAsArray);
+    }
 
     private function postCertificateRequest(string $uri, CertificateRequest $request) : CertificateResponse
     {
@@ -164,6 +185,12 @@ class MobileIdRestConnector implements MobileIdConnector
     {
         $responseJson = $this->postRequest($uri, $request);
         return new AuthenticationResponse($responseJson);
+    }
+
+    private function postSignRequest(string $uri, SignRequest $request) : SignResponse
+    {
+        $responseJson = $this->postRequest($uri, $request);
+        return new SignResponse($responseJson);
     }
 
     private function postRequest(string $url, AbstractRequest $paramsForJson) : array
