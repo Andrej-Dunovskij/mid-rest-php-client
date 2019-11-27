@@ -67,6 +67,18 @@ class SessionStatusPoller
 
     }
 
+    public function fetchFinalSignSession(string $sessionId, int $longPollSeconds = 20) : SessionStatus
+    {
+        return $this->fetchFinalSignatureSessionStatus($sessionId, $longPollSeconds);
+    }
+
+    public function fetchFinalSignSessionStatus(string $sessionId, int $longPollSeconds = null) : SessionStatus
+    {
+        $sessionStatus = $this->pollSignForFinalSessionStatus($sessionId, $longPollSeconds);
+        $this->validateResult($sessionStatus);
+        return $sessionStatus;
+    }
+
     public function fetchFinalSignatureSessionStatus(string $sessionId, int $longPollSeconds = 20) : SessionStatus
     {
         return $this->fetchFinalSessionStatus($sessionId, $longPollSeconds);
