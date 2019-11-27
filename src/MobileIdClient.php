@@ -117,7 +117,6 @@ class MobileIdClient
         return MidIdentity::parseFromCertificate($midCertificate);
     }
 
-
     public function createMobileIdAuthentication(SessionStatus $sessionStatus, MobileIdAuthenticationHashToSign $hash): MobileIdAuthentication
     {
         $this->validateResponse($sessionStatus);
@@ -125,6 +124,23 @@ class MobileIdClient
         $certificate = CertificateParser::parseX509Certificate($sessionStatus->getCert());
 
         return MobileIdAuthentication::newBuilder()
+            ->withResult($sessionStatus->getResult())
+            ->withSignatureValueInBase64($sessionSignature->getValue())
+            ->withAlgorithmName($sessionSignature->getAlgorithmName())
+            ->withCertificate($certificate)
+            ->withSignedHashInBase64($hash->getHashInBase64())
+            ->withHashType($hash->getHashType())
+            ->build();
+
+    }
+
+    public function createMobileIdSign(SessionStatus $sessionStatus, MobileIdSignHashToSign $hash): MobileIdSign
+    {
+        $this->validateResponse($sessionStatus);
+        $sessionSignature = $sessionStatus->getSignature();
+        $certificate = CertificateParser::parseX509Certificate($sessionStatus->getCert());
+
+        return MobileIdSign::newBuilder()
             ->withResult($sessionStatus->getResult())
             ->withSignatureValueInBase64($sessionSignature->getValue())
             ->withAlgorithmName($sessionSignature->getAlgorithmName())
